@@ -8,47 +8,51 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import {withStyles} from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = theme =>({
   root: {
     width: '100%',
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing(3),
     overflowX: "auto"
   },
   table: {
     minWidth: 1080
+  },
+  progress: {
+    margin: theme.spacing(2)
   }
 })
 
-const customers = [
-  {
-    id: 1,
-    image: 'https://placeimg.com/64/64/1',
-    name: '홍길동',
-    birthday: '961022',
-    gender: '남자',
-    job: '대학생'
-  },
-  {
-    id: 2,
-    image: 'https://placeimg.com/64/64/2',
-    name: '이완종',
-    birthday: '690724',
-    gender: '남자',
-    job: '직장인'
-  },
-  {
-    id: 3,
-    image: 'https://placeimg.com/64/64/3',
-    name: '임꺽정',
-    birthday: '19890101',
-    gender: '남자',
-    job: '군인'
-  }  
-];
-
 class App extends Component {
-  
+  state = {
+    customers: null,
+    completed: 0
+  }
+
+  componentDidMount(){
+    this.timer = setInterval(this.progress, 100);
+    this.callApi()
+      .then(res=> this.setState({customers: res}))
+      .catch(err => console.log(err));
+  }
+
+  callApi  = async () =>{
+    const response = await fetch('/api/customers');
+    const body = await response.json();
+    if(this.timer>0){
+      clearInterval(this.timer);
+      this.timer = 0;
+    }
+    return body;
+  }
+
+  progress = () => {
+    const {completed} = this.state;
+    console.log(completed);
+    this.setState({completed: (completed>100?0:(completed+1))});
+  }
+
   render(){
     const {classes} = this.props;
 
@@ -67,7 +71,8 @@ class App extends Component {
           </TableHead>
           <TableBody>
             {
-              customers.map(customer=>{
+              this.state.customers!=null?
+              this.state.customers.map(customer=>{
                 return (
                   <Customer 
                   key={customer.id}
@@ -79,6 +84,12 @@ class App extends Component {
                   job={customer.job}/>              
                 );
               })
+              :
+              <TableRow>
+                <TableCell colSpan="6" align="center">
+                  <CircularProgress className={classes.progress}  value={this.state.completed}/>
+                </TableCell>
+              </TableRow> 
             }
           </TableBody>
         </Table>
