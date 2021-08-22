@@ -80,6 +80,7 @@ class App extends Component {
                 <TableCell>생년월일</TableCell>
                 <TableCell>성별</TableCell>
                 <TableCell>직업</TableCell>
+                <TableCell>액션</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -94,12 +95,13 @@ class App extends Component {
                     name={customer.name}
                     birthday={customer.birthday}
                     gender={customer.gender}
-                    job={customer.job}/>              
+                    job={customer.job}
+                    stateRefresh={this.stateRefresh}/>              
                   );
                 })
                 :
                 <TableRow>
-                  <TableCell colSpan="6" align="center">
+                  <TableCell colSpan="7" align="center">
                     <CircularProgress className={classes.progress}  value={this.state.completed}/>
                   </TableCell>
                 </TableRow> 
